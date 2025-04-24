@@ -2,6 +2,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import LoginView from '../views/LoginView.vue'
 import ChatView from '../views/ChatView.vue'
+import ProcessedDocumentsView from '../views/ProcessedDocumentsView.vue' 
 // Import your store if needed for route guards
 // import { useAuthStore } from '@/store/auth'
 
@@ -17,6 +18,12 @@ const routes = [
     name: 'Chat',
     component: ChatView,
     meta: { requiresAuth: true } // Example meta field for auth logic
+  },
+  { 
+    path: '/ragdocs', // Route for processed documents
+    name: 'ProcessedDocuments',
+    component: ProcessedDocumentsView,
+    meta: { requiresAuth: true } // Assuming users must be logged in
   },
   // Add other routes like chat history, settings etc.
   // {

@@ -10,7 +10,14 @@
 </template>
 
 <script setup>
-  // import DefaultLayout from '@/layouts/DefaultLayout.vue'; // Example layout import
+import { onMounted } from 'vue';
+
+// Set the document title when the app mounts
+onMounted(() => {
+  // Access the env variable using import.meta.env
+  // Provide a fallback in case the variable isn't set
+  document.title = import.meta.env.VITE_APP_TITLE || 'CII RAG Application';
+});
 </script>
 
 <style>

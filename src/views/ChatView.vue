@@ -14,6 +14,16 @@
             prepend-icon="mdi-message-text-outline"
           >
           </v-list-item>
+        
+        <!-- Link to Processed Documents Page -->
+        <v-divider class="my-2"></v-divider>
+         <v-list-item
+            title="Rag Files"
+            prepend-icon="mdi-file-check-outline"
+            to="/ragdocs"  
+            link
+         ></v-list-item>
+        <!-- End Link -->
         </v-list>
          <template v-slot:append>
           <div class="pa-2">
@@ -27,7 +37,7 @@
       <!-- App Bar (No changes needed here) -->
       <v-app-bar color="primary" density="compact">
          <v-app-bar-nav-icon v-if="!isDesktop" @click="drawerOpen = !drawerOpen"></v-app-bar-nav-icon>
-        <v-app-bar-title>CII LLM Chat</v-app-bar-title>
+        <v-app-bar-title>{{ appTitle }}</v-app-bar-title>
         <v-spacer></v-spacer>
         <v-btn icon="mdi-logout" title="Logout"></v-btn>
       </v-app-bar>
@@ -95,6 +105,9 @@
     import ChatInput from '@/components/ChatInput.vue';
     import ChatMessage from '@/components/ChatMessage.vue';
     import { useChatStore } from '@/store/chat';
+
+    // Access the environment variable for the app bar title
+    const appTitle = import.meta.env.VITE_APP_TITLE || 'RAG Chat';
   
     const chatStore = useChatStore();
     const messageContainerRef = ref(null);
