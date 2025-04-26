@@ -36,39 +36,90 @@
   
       <!-- App Bar (No changes needed here) -->
       <v-app-bar color="primary" density="compact">
-         <v-app-bar-nav-icon v-if="!isDesktop" @click="drawerOpen = !drawerOpen"></v-app-bar-nav-icon>
-        <v-app-bar-title>{{ appTitle }}</v-app-bar-title>
+        <v-app-bar-nav-icon v-if="!isDesktop" @click="drawerOpen = !drawerOpen"></v-app-bar-nav-icon>
+        <v-app-bar-title>
+        <!-- Add CII Logo -->
+        <v-img
+            src="/logo.png"  
+            alt="CII Logo"
+            max-height="32" 
+            max-width="100" 
+            contain 
+            class="mr-4"
+        ></v-img>
+        {{ appTitle }}
+        </v-app-bar-title>
         <v-spacer></v-spacer>
+        
+        <!-- Logout button remains -->
         <v-btn icon="mdi-logout" title="Logout"></v-btn>
       </v-app-bar>
+
   
       <!-- === Modified v-main === -->
       <!-- Make v-main itself a flex column -->
       <v-main style="height: 100vh; display: flex; flex-direction: column;">
-  
-        <!-- Scrollable message list container -->
-        <!-- Let this container grow and scroll -->
-        <v-container fluid class="pa-4 flex-grow-1 overflow-y-auto" ref="messageContainerRef">
-          <!-- Display Messages (No changes needed here) -->
-          <template v-if="chatStore.messages.length === 0">
-             <p class="text-center text-grey my-5">Start chatting by typing below...</p>
-          </template>
-          <template v-else>
-            <ChatMessage
-              v-for="msg in chatStore.messages"
-              :key="msg.id"
-              :message="msg"
-            />
-          </template>
-           <!-- Loading Indicator (No changes needed here) -->
-           <div v-if="chatStore.isLoading" class="d-flex justify-start pa-4">
-              <v-progress-circular indeterminate color="primary" size="24"></v-progress-circular>
-              <span class="ml-2 text-grey">Thinking...</span>
-           </div>
+
+        <!-- === A: Chat Message Area (Only shown if messages exist) === -->
+        <v-container
+          v-if="chatStore.messages.length > 0"
+          fluid
+          class="pa-4 flex-grow-1 overflow-y-auto"
+          ref="messageContainerRef"
+        >
+          <!-- Display Messages -->
+          <ChatMessage
+            v-for="msg in chatStore.messages"
+            :key="msg.id"
+            :message="msg"
+          />
+          <!-- Loading Indicator -->
+          <div v-if="chatStore.isLoading" class="d-flex justify-start pa-4">
+            <v-progress-circular indeterminate color="primary" size="24"></v-progress-circular>
+            <span class="ml-2 text-grey">Thinking...</span>
+          </div>
         </v-container>
-        <!-- === End Message Container === -->
-  
-  
+        <!-- === End Chat Message Area === -->
+
+        <!-- === B: Initial Welcome Screen (Only shown if NO messages exist) === -->
+        <v-container v-else fluid class="pa-4 flex-grow-1 overflow-y-auto">
+          <!-- Blue Info Box -->
+          <v-sheet color="grey-lighten-2" rounded="lg" class="pa-5 text-black elevation-2">
+            <p class="mb-4">
+              I am an online assistant here to help you with questions related to the Construction Industry Institute (CII). I can provide information about CII's history, services, membership, and other related topics.
+            </p>
+            <p class="mb-2">Here are the functions I can perform:</p>
+            <ol class="ml-5 mb-4" style="list-style-type: decimal;">
+              <li><strong>Get Membership Status:</strong> I can provide details about your current membership status with CII.</li>
+              <li><strong>Search Member Organizations:</strong> I can help you find information about member organizations of CII based on your search criteria.</li>
+              <li><strong>Search CII Website Content:</strong> I can search for specific information on the CII website regarding various topics related to CII.</li>
+              <li><strong>Get Download History Graph:</strong> I can provide a graphical representation of download history related to CII.</li>
+            </ol>
+            <p>
+              Feel free to ask any questions related to CII, and I'll do my best to assist you!
+            </p>
+          </v-sheet>
+
+          <!-- Follow-up Questions Section -->
+          <div class="mt-6 mb-4">
+            <p class="text-grey-lighten-1 font-weight-medium mb-3">Follow-up Questions:</p>
+            <div class="d-flex flex-wrap ga-2">
+              <v-chip
+                v-for="question in sampleQuestions"
+                :key="question"
+                @click="sendSampleQuestion(question)"
+                color="grey-lighten-3"
+                variant="elevated"
+                label
+                style="cursor: pointer;"
+              >
+                {{ question }}
+              </v-chip>
+            </div>
+          </div>
+        </v-container>
+        <!-- === End Initial Welcome Screen === -->
+
         <!-- === Input area - Now directly inside v-main === -->
         <!-- Use v-sheet for background/padding control, it will take full width -->
         <v-sheet color="grey-lighten-5" class="pa-2 flex-shrink-0">
@@ -129,6 +180,21 @@
     const handleSendMessage = (messageText) => {
       chatStore.sendMessage(messageText);
     };
+
+    // --- Sample Questions ---
+    const sampleQuestions = ref([
+        'Why is advanced work packaging important with capital projects',
+        'As a capital projects planner show me the latest research for industrial modularization',
+        'As a capital projects planner what front end planning courses should I take',
+        'As a capital projects planner how should I be planning for infrastructure risk',
+        'Show me the latest research on constructability',
+        'Show me the latest research on industrial construction design'
+    ]);
+
+    const sendSampleQuestion = (question) => {
+        handleSendMessage(question);
+    }
+    // --- End Sample Questions ---
   </script>
   
   <style scoped>
@@ -138,9 +204,15 @@
     .v-container.flex-grow-1 {
         min-height: 0; /* Helps flex-grow work correctly in column layout */
     }
+
+    /* Style for the list inside the info box */
+    .v-sheet ol li {
+        margin-bottom: 8px; /* Add space between list items */
+    }
   
     /* Optional: Ensure v-main content doesn't go under the app bar */
     /* Vuetify usually handles this, but add if needed */
     /* .v-main { padding-top: 48px !important; } */ /* Adjust 48px if app-bar density changes */
-  </style>
+</style>
   
+

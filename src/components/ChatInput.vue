@@ -3,8 +3,8 @@
   <v-textarea
     v-model="newMessage"
     label="Ask something..."
-    rows="2"
-    max-rows="5"
+    rows="3"
+    max-rows="10"
     auto-grow
     variant="solo"
     append-inner-icon="mdi-send"
