@@ -18,6 +18,35 @@ export default {
   getProcessedDocuments(collectionName = null) {
     const params = collectionName ? { collection_name: collectionName } : {};
     return apiClient.get('/processed_documents', { params });
+  },
+
+  // Function to upload a file
+  uploadFile(file, processImmediately = true, collectionName = null) {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('process_immediately', processImmediately);
+    if (collectionName) {
+      formData.append('collection_name', collectionName);
+    }
+    
+    return apiClient.post('/upload_file', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+  },
+
+  // Function to delete a file
+  deleteFile(filename, collectionName = null) {
+    const payload = { filename };
+    if (collectionName) {
+      payload.collection_name = collectionName;
+    }
+    return apiClient.request({
+      method: 'DELETE',
+      url: '/delete_file',
+      data: payload
+    });
   }
 
   // Add functions for login, save chat, get history later
