@@ -25,7 +25,7 @@
             title="Knowledge Base"
             subtitle="Manage documents"
             prepend-icon="mdi-database"
-            to="/ragdocs"  
+            to="/knowledge-base"  
             link
             class="sidebar-item knowledge-base-link"
          ></v-list-item>

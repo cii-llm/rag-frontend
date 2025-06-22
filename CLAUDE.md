@@ -96,6 +96,10 @@ The production build has been optimized to reduce bundle sizes and improve loadi
 - Delete: `DELETE /delete_file`
 - List: `GET /list_processed_files`
 
+### URL Structure:
+- Chat Interface: `/` (root)
+- Knowledge Base: `/knowledge-base` (formerly `/ragdocs`)
+
 ## Known Issues & Fixes
 
 ### ChromaDB API Error:

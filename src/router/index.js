@@ -20,8 +20,8 @@ const routes = [
     meta: { requiresAuth: true } // Example meta field for auth logic
   },
   { 
-    path: '/ragdocs', // Route for processed documents
-    name: 'ProcessedDocuments',
+    path: '/knowledge-base', // Route for knowledge base management
+    name: 'KnowledgeBase',
     component: ProcessedDocumentsView,
     meta: { requiresAuth: true } // Assuming users must be logged in
   },
