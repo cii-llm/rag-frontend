@@ -50,16 +50,18 @@
       <v-app-bar class="app-bar" elevation="0" density="compact">
         <v-app-bar-nav-icon @click="drawerOpen = !drawerOpen" class="nav-icon"></v-app-bar-nav-icon>
         <v-app-bar-title class="app-title">
-        <!-- Add CII Logo -->
-        <v-img
-            src="/logo.png"  
-            alt="CII Logo"
-            max-height="32" 
-            max-width="100" 
-            contain 
-            class="mr-4"
-        ></v-img>
-        {{ appTitle }}
+        <div class="d-flex align-center">
+          <!-- Add CII Logo -->
+          <v-img
+              src="/logo.png"  
+              alt="CII Logo"
+              max-height="32" 
+              max-width="100" 
+              contain 
+              class="mr-3"
+          ></v-img>
+          <span class="app-name">{{ appTitle }}</span>
+        </div>
         </v-app-bar-title>
         <v-spacer></v-spacer>
         
@@ -174,7 +176,7 @@
     import { useChatStore } from '@/store/chat';
 
     // Access the environment variable for the app bar title
-    const appTitle = import.meta.env.VITE_APP_TITLE || 'RAG Chat';
+    const appTitle = import.meta.env.VITE_APP_TITLE || 'GPT';
   
     const chatStore = useChatStore();
     const messageContainerRef = ref(null);
@@ -303,6 +305,13 @@
     .app-title {
       color: #111827 !important;
       font-weight: 600 !important;
+    }
+
+    .app-name {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #164f9a;
+      letter-spacing: 0.025em;
     }
 
     .nav-icon {
