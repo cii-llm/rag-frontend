@@ -27,7 +27,7 @@
                     color="success" 
                     variant="tonal"
                   >
-                    {{ documentsStore.processedFiles?.length || 0 }} documents
+                    {{ filteredDocuments?.length || 0 }} / {{ documentsStore.processedFiles?.length || 0 }} documents
                   </v-chip>
                 </div>
               </div>
@@ -48,6 +48,20 @@
         <v-card-subtitle class="documents-subtitle">
           Your indexed documents are ready for intelligent search and retrieval
         </v-card-subtitle>
+
+        <!-- Search Filter -->
+        <div class="search-section">
+          <v-text-field
+            v-model="searchQuery"
+            placeholder="Search documents..."
+            prepend-inner-icon="mdi-magnify"
+            variant="outlined"
+            density="compact"
+            clearable
+            class="search-input"
+            hide-details
+          ></v-text-field>
+        </div>
   
         <v-divider></v-divider>
   
@@ -93,12 +107,31 @@
             Upload Documents
           </v-btn>
         </div>
+
+        <!-- No Search Results -->
+        <div
+          v-else-if="searchQuery && filteredDocuments.length === 0"
+          class="empty-state"
+        >
+          <v-icon size="80" color="primary" class="mb-4">mdi-file-search-outline</v-icon>
+          <h4 class="text-h5 mb-2">No Documents Found</h4>
+          <p class="text-body-1 text-medium-emphasis mb-4">No documents match your search for "{{ searchQuery }}"</p>
+          <v-btn 
+            color="primary" 
+            variant="outlined" 
+            rounded="xl"
+            @click="searchQuery = ''"
+          >
+            <v-icon left>mdi-close</v-icon>
+            Clear Search
+          </v-btn>
+        </div>
   
         <!-- Document List -->
         <v-list class="document-list" v-else>
           <transition-group name="list-item" tag="div">
             <v-list-item
-              v-for="(filename, index) in documentsStore.processedFiles"
+              v-for="(filename, index) in filteredDocuments"
               :key="filename"
               :title="filename"
               :prepend-icon="getFileIcon(filename)"
@@ -205,12 +238,27 @@
   </template>
   
   <script setup>
-  import { onMounted, ref } from 'vue';
+  import { onMounted, ref, computed } from 'vue';
   import { useDocumentsStore } from '@/store/documents';
   import FileUpload from '@/components/FileUpload.vue';
   import ragApi from '@/services/ragApi';
   
   const documentsStore = useDocumentsStore();
+  
+  // Search functionality
+  const searchQuery = ref('');
+  
+  // Computed filtered documents
+  const filteredDocuments = computed(() => {
+    if (!searchQuery.value || !documentsStore.processedFiles) {
+      return documentsStore.processedFiles || [];
+    }
+    
+    const query = searchQuery.value.toLowerCase();
+    return documentsStore.processedFiles.filter(filename => 
+      filename.toLowerCase().includes(query)
+    );
+  });
   
   // Delete functionality
   const deleteDialog = ref(false);
@@ -321,6 +369,22 @@
     padding: 1rem 2rem 0.5rem;
     font-size: 1rem;
     color: #6b7280;
+  }
+
+  .search-section {
+    padding: 1rem 2rem;
+    background: #f9fafb;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  .search-input :deep(.v-field) {
+    background: #ffffff;
+    border-radius: 8px;
+  }
+
+  .search-input :deep(.v-field:focus-within) {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
   }
 
   .refresh-btn {
