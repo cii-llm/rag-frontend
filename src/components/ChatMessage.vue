@@ -6,16 +6,12 @@
         <v-icon :icon="avatarIcon"></v-icon>
     </v-avatar> -->
 
-    <v-sheet
-      :color="bubbleColor"
-      :class="textColorClass"
-      rounded="lg"
-      elevation="1"
-      class="pa-3 message-bubble"
+    <div
+      :class="messageClass"
+      class="message-content"
       max-width="80%"
     >
       <!-- Render message content safely -->
-      <!-- Use v-text for plain text or a markdown renderer for formatted text -->
       <div v-text="message.text" class="message-text"></div>
 
       <!-- Optional: Add timestamp or citation details -->
@@ -25,7 +21,7 @@
        <div v-if="message.timestamp" class="text-caption mt-1 text-right timestamp">
          {{ formattedTimestamp }}
        </div>
-    </v-sheet>
+    </div>
   </div>
 </template>
 
@@ -49,16 +45,10 @@ const alignmentClass = computed(() => {
   return 'justify-start'; // AI and Error messages align left
 });
 
-const bubbleColor = computed(() => {
-  if (isUser.value) return 'primary';
-  if (isError.value) return 'error-lighten-4'; // Lighter error background
-  return 'grey-lighten-3'; // AI message background
-});
-
-const textColorClass = computed(() => {
-  if (isUser.value) return 'text-white';
-  if (isError.value) return 'text-error-darken-2'; // Darker error text
-  return ''; // Default text color for AI
+const messageClass = computed(() => {
+  if (isUser.value) return 'user-message';
+  if (isError.value) return 'error-message';
+  return 'ai-message';
 });
 
 // --- Optional Avatar ---
@@ -84,19 +74,58 @@ const textColorClass = computed(() => {
 </script>
 
 <style scoped>
-.message-bubble {
+.message-content {
   word-wrap: break-word;
-  white-space: pre-wrap; /* Preserve whitespace and wrap */
+  white-space: pre-wrap;
+  max-width: 80%;
+  padding: 1rem;
 }
+
 .message-text {
-    line-height: 1.5;
+  line-height: 1.6;
 }
+
 .citation-details {
   opacity: 0.8;
   font-style: italic;
 }
+
 .timestamp {
-    opacity: 0.7;
-    font-size: 0.7rem;
+  opacity: 0.7;
+  font-size: 0.7rem;
+}
+
+/* User messages - gray box */
+.user-message {
+  background: #f3f4f6;
+  border: 1px solid #d1d5db;
+  border-radius: 12px;
+  color: #111827;
+  margin-left: auto;
+}
+
+/* AI messages - clean text, no box */
+.ai-message {
+  background: transparent;
+  border: none;
+  color: #374151;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+/* Error messages - light red background */
+.error-message {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 12px;
+  color: #dc2626;
+}
+
+/* Hover effects only for boxed messages */
+.user-message:hover,
+.error-message:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
 }
 </style>

@@ -21,7 +21,15 @@ onMounted(() => {
 </script>
 
 <style>
-  /* Optional: Add global styles here or in assets/main.css */
+  /* Fix layout to eliminate space below v-main */
+  .v-app {
+    height: 100vh !important;
+    overflow: hidden !important;
+  }
+  
+  .v-main {
+    height: 100vh !important;
+  }
 </style>
 
     
