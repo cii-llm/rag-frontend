@@ -1,85 +1,128 @@
 <template>
-  <v-card>
-    <v-card-title class="d-flex align-center">
-      <v-icon left>mdi-upload</v-icon>
-      Upload Document
+  <v-card class="upload-card" elevation="8" rounded="xl">
+    <v-card-title class="upload-header">
+      <div class="d-flex align-center">
+        <v-avatar size="40" color="primary" class="mr-3">
+          <v-icon color="white">mdi-cloud-upload</v-icon>
+        </v-avatar>
+        <div>
+          <h3 class="text-h6 mb-0">Upload Documents</h3>
+          <p class="text-caption text-medium-emphasis mb-0">Add PDF and DOCX files to your knowledge base</p>
+        </div>
+      </div>
     </v-card-title>
-    <v-card-text>
+    <v-card-text class="upload-content">
       <v-file-input
         v-model="selectedFiles"
         :accept="acceptedFileTypes"
         :loading="isUploading"
         :disabled="isUploading"
-        label="Choose files to upload"
-        prepend-icon="mdi-paperclip"
+        label="Drag files here or click to browse"
+        prepend-icon="mdi-file-plus"
         multiple
         show-size
         chips
         variant="outlined"
+        color="primary"
+        class="file-input-modern"
         @change="onFileSelect"
       >
         <template v-slot:selection="{ fileNames }">
           <template v-for="(fileName, index) in fileNames" :key="fileName">
             <v-chip
-              v-if="index < 2"
+              v-if="index < 3"
               color="primary"
+              variant="elevated"
               size="small"
-              label
+              class="ma-1 file-chip"
+              prepend-icon="mdi-file-document"
             >
               {{ fileName }}
             </v-chip>
-            <span
-              v-else-if="index === 2"
-              class="text-overline grey--text text--darken-3 mx-2"
+            <v-chip
+              v-else-if="index === 3"
+              color="secondary"
+              variant="outlined"
+              size="small"
+              class="ma-1"
             >
-              +{{ fileNames.length - 2 }} File(s)
-            </span>
+              +{{ fileNames.length - 3 }} more
+            </v-chip>
           </template>
         </template>
       </v-file-input>
 
-      <v-switch
-        v-model="processImmediately"
-        :disabled="isUploading"
-        label="Process files immediately after upload"
-        color="primary"
-        class="mt-2"
-      ></v-switch>
+      <div class="mt-4">
+        <v-switch
+          v-model="processImmediately"
+          :disabled="isUploading"
+          color="primary"
+          class="switch-modern"
+          hide-details
+        >
+          <template v-slot:label>
+            <div class="d-flex align-center">
+              <v-icon size="small" class="mr-2">mdi-lightning-bolt</v-icon>
+              <span class="text-body-2 font-weight-medium">Auto-process files</span>
+            </div>
+          </template>
+        </v-switch>
+        <p class="text-caption text-medium-emphasis ml-8 mt-1">
+          Files will be automatically indexed into the knowledge base
+        </p>
+      </div>
 
-      <v-alert
-        v-if="error"
-        type="error"
-        variant="tonal"
-        class="mt-3"
-        closable
-        @click:close="error = null"
-      >
-        {{ error }}
-      </v-alert>
+      <transition name="slide-y-transition">
+        <v-alert
+          v-if="error"
+          type="error"
+          variant="tonal"
+          class="mt-4 alert-modern"
+          closable
+          rounded="lg"
+          @click:close="error = null"
+        >
+          <template v-slot:prepend>
+            <v-icon>mdi-alert-circle</v-icon>
+          </template>
+          {{ error }}
+        </v-alert>
+      </transition>
 
-      <v-alert
-        v-if="successMessage"
-        type="success"
-        variant="tonal"
-        class="mt-3"
-        closable
-        @click:close="successMessage = null"
-      >
-        {{ successMessage }}
-      </v-alert>
+      <transition name="slide-y-transition">
+        <v-alert
+          v-if="successMessage"
+          type="success"
+          variant="tonal"
+          class="mt-4 alert-modern"
+          closable
+          rounded="lg"
+          @click:close="successMessage = null"
+        >
+          <template v-slot:prepend>
+            <v-icon>mdi-check-circle</v-icon>
+          </template>
+          {{ successMessage }}
+        </v-alert>
+      </transition>
     </v-card-text>
 
-    <v-card-actions>
+    <v-card-actions class="px-6 pb-6">
       <v-spacer></v-spacer>
       <v-btn
         :disabled="!selectedFiles || selectedFiles.length === 0 || isUploading"
         :loading="isUploading"
         color="primary"
         variant="elevated"
+        size="large"
+        class="upload-btn"
+        rounded="xl"
         @click="uploadFiles"
       >
-        <v-icon left>mdi-upload</v-icon>
-        Upload {{ selectedFiles ? selectedFiles.length : 0 }} File(s)
+        <template v-slot:prepend>
+          <v-icon>mdi-cloud-upload</v-icon>
+        </template>
+        Upload {{ selectedFiles ? selectedFiles.length : 0 }} File{{ selectedFiles && selectedFiles.length !== 1 ? 's' : '' }}
       </v-btn>
     </v-card-actions>
 
@@ -88,7 +131,9 @@
       v-if="isUploading"
       :model-value="uploadProgress"
       color="primary"
-      height="6"
+      height="8"
+      class="progress-modern"
+      rounded
     ></v-progress-linear>
   </v-card>
 </template>
@@ -183,7 +228,96 @@ const uploadFiles = async () => {
 </script>
 
 <style scoped>
-.v-file-input {
-  margin-bottom: 1rem;
+.upload-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  transition: all 0.2s ease;
+}
+
+.upload-card:hover {
+  border-color: #d1d5db;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.upload-header {
+  background: #f8fafc;
+  border-bottom: 1px solid #e5e7eb;
+  color: #1f2937 !important;
+}
+
+.upload-content {
+  background: #ffffff;
+  padding: 1.5rem;
+}
+
+.file-input-modern {
+  border-radius: 12px !important;
+}
+
+.file-input-modern :deep(.v-field) {
+  border-radius: 8px;
+  background: #f9fafb;
+  border: 2px dashed #d1d5db;
+  transition: all 0.2s ease;
+}
+
+.file-input-modern :deep(.v-field:hover) {
+  border-color: #6366f1;
+  background: #f8fafc;
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.1);
+}
+
+.file-chip {
+  background: #6366f1 !important;
+  color: white !important;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.file-chip:hover {
+  background: #4f46e5 !important;
+}
+
+.upload-btn {
+  background: #6366f1 !important;
+  color: white !important;
+  font-weight: 600 !important;
+  text-transform: none !important;
+  letter-spacing: 0.025em !important;
+  transition: all 0.2s ease !important;
+}
+
+.upload-btn:hover {
+  background: #4f46e5 !important;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25) !important;
+}
+
+.upload-btn:disabled {
+  background: #9ca3af !important;
+  color: white !important;
+}
+
+.progress-modern {
+  background: #f3f4f6 !important;
+}
+
+.alert-modern {
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.slide-y-transition-enter-active,
+.slide-y-transition-leave-active {
+  transition: all 0.3s ease;
+}
+
+.slide-y-transition-enter-from {
+  opacity: 0;
+  transform: translateY(-20px);
+}
+
+.slide-y-transition-leave-to {
+  opacity: 0;
+  transform: translateY(-20px);
 }
 </style>
