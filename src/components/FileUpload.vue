@@ -7,7 +7,7 @@
         </v-avatar>
         <div>
           <h3 class="text-h6 mb-0">Upload Documents</h3>
-          <p class="text-caption text-medium-emphasis mb-0">Add PDF and DOCX files to your knowledge base</p>
+          <p class="text-caption text-medium-emphasis mb-0">Add PDF and DOCX files - they'll be processed and indexed automatically</p>
         </div>
       </div>
     </v-card-title>
@@ -52,25 +52,6 @@
         </template>
       </v-file-input>
 
-      <div class="mt-4">
-        <v-switch
-          v-model="processImmediately"
-          :disabled="isUploading"
-          color="primary"
-          class="switch-modern"
-          hide-details
-        >
-          <template v-slot:label>
-            <div class="d-flex align-center">
-              <v-icon size="small" class="mr-2">mdi-lightning-bolt</v-icon>
-              <span class="text-body-2 font-weight-medium">Auto-process files</span>
-            </div>
-          </template>
-        </v-switch>
-        <p class="text-caption text-medium-emphasis ml-8 mt-1">
-          Files will be automatically indexed into the knowledge base
-        </p>
-      </div>
 
       <transition name="slide-y-transition">
         <v-alert
@@ -146,7 +127,6 @@ const emit = defineEmits(['upload-complete'])
 
 // Reactive data
 const selectedFiles = ref([])
-const processImmediately = ref(true)
 const isUploading = ref(false)
 const uploadProgress = ref(0)
 const error = ref(null)
@@ -180,7 +160,7 @@ const uploadFiles = async () => {
 
     for (const file of selectedFiles.value) {
       try {
-        const result = await ragApi.uploadFile(file, processImmediately.value)
+        const result = await ragApi.uploadFile(file, true)
         results.push({ file: file.name, success: true, result })
         completedFiles++
         uploadProgress.value = (completedFiles / totalFiles) * 100

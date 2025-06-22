@@ -1,6 +1,77 @@
       
 <template>
-    <v-container class="documents-container">
+  <v-layout class="fill-height documents-layout">
+    <!-- Navigation Drawer -->
+    <v-navigation-drawer v-model="drawerOpen" :permanent="false" location="left" width="300" class="sidebar">
+      <div class="sidebar-header">
+        <h3 class="text-h6 mb-1">Navigation</h3>
+        <p class="text-caption text-medium-emphasis">App Sections</p>
+      </div>
+      <v-divider></v-divider>
+      <v-list nav density="compact" class="sidebar-list">
+        <!-- Link to Chat Page -->
+        <v-list-item
+          title="Chat"
+          subtitle="AI Assistant"
+          prepend-icon="mdi-message-text-outline"
+          to="/"
+          link
+          class="sidebar-item chat-link"
+        ></v-list-item>
+        
+        <!-- Link to Knowledge Base (Current Page) -->
+        <v-list-item
+          title="Knowledge Base"
+          subtitle="Manage documents"
+          prepend-icon="mdi-database"
+          to="/ragdocs"
+          link
+          class="sidebar-item knowledge-base-link active"
+        ></v-list-item>
+      </v-list>
+      
+      <template v-slot:append>
+        <div class="sidebar-footer">
+          <v-btn 
+            block 
+            variant="outlined" 
+            @click="refreshList" 
+            prepend-icon="mdi-refresh"
+            class="refresh-docs-btn"
+            :loading="documentsStore.isLoading"
+          >
+            Refresh Documents
+          </v-btn>
+        </div>
+      </template>
+    </v-navigation-drawer>
+
+    <!-- App Bar -->
+    <v-app-bar class="app-bar" elevation="0" density="compact">
+      <v-app-bar-nav-icon @click="drawerOpen = !drawerOpen" class="nav-icon"></v-app-bar-nav-icon>
+      <v-app-bar-title class="app-title">
+        <div class="d-flex align-center">
+          <!-- Add CII Logo -->
+          <v-img
+            src="/logo.png"  
+            alt="CII Logo"
+            max-height="32" 
+            max-width="100" 
+            contain 
+            class="mr-3"
+          ></v-img>
+          <span class="app-name">{{ appTitle }}</span>
+        </div>
+      </v-app-bar-title>
+      <v-spacer></v-spacer>
+      
+      <!-- Logout button -->
+      <v-btn icon="mdi-logout" title="Logout" class="logout-btn" variant="text"></v-btn>
+    </v-app-bar>
+
+    <!-- Main Content -->
+    <v-main class="documents-main">
+      <v-container class="documents-container">
       <!-- File Upload Section -->
       <FileUpload @upload-complete="onUploadComplete" class="mb-8" />
       
@@ -234,8 +305,10 @@
           </v-card-actions>
         </v-card>
       </v-dialog>
-    </v-container>
-  </template>
+      </v-container>
+    </v-main>
+  </v-layout>
+</template>
   
   <script setup>
   import { onMounted, ref, computed } from 'vue';
@@ -244,6 +317,10 @@
   import ragApi from '@/services/ragApi';
   
   const documentsStore = useDocumentsStore();
+  
+  // Access the environment variable for the app bar title
+  const appTitle = import.meta.env.VITE_APP_TITLE || 'GPT';
+  const drawerOpen = ref(true); // Sidebar open by default
   
   // Search functionality
   const searchQuery = ref('');
@@ -340,10 +417,118 @@
   </script>
   
   <style scoped>
+  /* Layout */
+  .documents-layout {
+    background: #f8fafc;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  .documents-main {
+    height: calc(100vh - 64px); /* Subtract app bar height */
+    background: #f8fafc;
+    overflow-y: auto;
+  }
+
   .documents-container {
     background: #f8fafc;
-    min-height: 100vh;
+    min-height: 100%;
     padding: 2rem;
+  }
+
+  /* Sidebar */
+  .sidebar {
+    background: #ffffff !important;
+    border-right: 1px solid #e5e7eb !important;
+  }
+
+  .sidebar-header {
+    padding: 1.5rem 1rem 1rem;
+    border-bottom: 1px solid #f3f4f6;
+  }
+
+  .sidebar-list {
+    padding: 0.5rem 0;
+  }
+
+  .sidebar-item {
+    margin: 0.25rem 0.75rem;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+  }
+
+  .sidebar-item:hover {
+    background: #f9fafb !important;
+  }
+
+  .chat-link {
+    background: #f8fafc !important;
+    border: 1px solid #e5e7eb;
+  }
+
+  .chat-link:hover {
+    background: #f3f4f6 !important;
+    border-color: #d1d5db;
+  }
+
+  .knowledge-base-link.active {
+    background: #eef2ff !important;
+    border: 1px solid #c7d2fe;
+    color: #3730a3 !important;
+  }
+
+  .knowledge-base-link.active:hover {
+    background: #e0e7ff !important;
+    border-color: #a5b4fc;
+  }
+
+  .sidebar-footer {
+    padding: 1rem;
+  }
+
+  .refresh-docs-btn {
+    border-color: #e5e7eb !important;
+    color: #6b7280 !important;
+    transition: all 0.2s ease;
+  }
+
+  .refresh-docs-btn:hover {
+    border-color: #6366f1 !important;
+    color: #6366f1 !important;
+    background: #f8fafc !important;
+  }
+
+  /* App Bar */
+  .app-bar {
+    background: #ffffff !important;
+    border-bottom: 1px solid #e5e7eb !important;
+    color: #111827 !important;
+  }
+
+  .app-title {
+    color: #111827 !important;
+    font-weight: 600 !important;
+  }
+
+  .app-name {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #164f9a;
+    letter-spacing: 0.025em;
+  }
+
+  .nav-icon {
+    color: #6b7280 !important;
+  }
+
+  .logout-btn {
+    color: #6b7280 !important;
+    transition: all 0.2s ease;
+  }
+
+  .logout-btn:hover {
+    background: #f9fafb !important;
+    color: #111827 !important;
   }
 
   .documents-card {

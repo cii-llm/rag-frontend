@@ -50,11 +50,22 @@ The production build has been optimized to reduce bundle sizes and improve loadi
 
 ## Layout Architecture
 
-### ChatView Layout:
+### Consistent Layout Across Pages:
 - **Fixed Height**: 100vh for full-screen experience
 - **Sidebar**: Toggleable navigation drawer (300px width, not overlay)
+- **App Bar**: Consistent header with logo, title, and logout button
+- **Navigation**: Links between Chat and Knowledge Base pages
+
+### ChatView Layout:
 - **Main Chat**: Flexible scroll area with fixed input at bottom
 - **Input Area**: Always visible at window bottom, not floating
+- **Sidebar**: Chat history and navigation links
+
+### ProcessedDocumentsView Layout:
+- **Main Content**: Scrollable document management area
+- **File Upload**: Integrated file upload component
+- **Document List**: Searchable and filterable document display
+- **Sidebar**: Navigation links and refresh functionality
 
 ### Critical Layout Fix:
 **Issue**: Chat input appearing below viewport  
