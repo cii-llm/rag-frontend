@@ -9,14 +9,47 @@
         </div>
         <v-divider></v-divider>
         <v-list nav density="compact" class="sidebar-list">
+          <!-- New Chat Button -->
           <v-list-item
-            v-for="i in 5"
-            :key="i"
-            :title="`Conversation ${i}`"
-            link
+            @click="chatStore.createNewSession()"
+            prepend-icon="mdi-plus"
+            title="New Chat"
+            class="sidebar-item new-chat-item"
+          ></v-list-item>
+          
+          <!-- Chat History Section -->
+          <v-list-subheader class="text-medium-emphasis">Recent Chats</v-list-subheader>
+          <v-list-item
+            v-for="session in chatStore.sessions.slice(0, 10)"
+            :key="session.id"
+            :title="session.title"
+            :subtitle="`${session.message_count || 0} messages`"
+            @click="chatStore.loadSession(session.id)"
+            :active="chatStore.currentSessionId === session.id"
             prepend-icon="mdi-message-text-outline"
-            class="sidebar-item"
+            class="sidebar-item chat-session-item"
           >
+            <template v-slot:append>
+              <v-menu>
+                <template v-slot:activator="{ props }">
+                  <v-btn icon="mdi-dots-vertical" size="small" variant="text" v-bind="props"></v-btn>
+                </template>
+                <v-list>
+                  <v-list-item @click="archiveSession(session.id)">
+                    <template v-slot:prepend>
+                      <v-icon>mdi-archive</v-icon>
+                    </template>
+                    <v-list-item-title>Archive</v-list-item-title>
+                  </v-list-item>
+                  <v-list-item @click="deleteSession(session.id)">
+                    <template v-slot:prepend>
+                      <v-icon>mdi-delete</v-icon>
+                    </template>
+                    <v-list-item-title>Delete</v-list-item-title>
+                  </v-list-item>
+                </v-list>
+              </v-menu>
+            </template>
           </v-list-item>
         
         <!-- Link to Processed Documents Page -->
@@ -65,8 +98,17 @@
         </v-app-bar-title>
         <v-spacer></v-spacer>
         
-        <!-- Logout button -->
-        <v-btn icon="mdi-logout" title="Logout" class="logout-btn" variant="text"></v-btn>
+        <!-- User info and logout -->
+        <div class="d-flex align-center">
+          <span class="text-caption mr-3">{{ authStore.currentUser?.username || 'Demo User' }}</span>
+          <v-btn 
+            icon="mdi-logout" 
+            title="Logout" 
+            class="logout-btn" 
+            variant="text"
+            @click="authStore.logout"
+          ></v-btn>
+        </div>
       </v-app-bar>
 
   
@@ -168,22 +210,30 @@
   </template>
   
   <script setup>
-    // Script content remains the same as before
     import { ref, watch, onMounted, computed, nextTick } from 'vue';
     import { useDisplay } from 'vuetify'
     import ChatInput from '@/components/ChatInput.vue';
     import ChatMessage from '@/components/ChatMessage.vue';
     import { useChatStore } from '@/store/chat';
+    import { useAuthStore } from '@/store/auth';
 
     // Access the environment variable for the app bar title
     const appTitle = import.meta.env.VITE_APP_TITLE || 'GPT';
   
     const chatStore = useChatStore();
+    const authStore = useAuthStore();
     const messageContainerRef = ref(null);
     const { mdAndUp } = useDisplay();
     const isDesktop = computed(() => mdAndUp.value);
     const drawerOpen = ref(true);
-    // Sidebar open by default
+    
+    // Initialize authentication and load chat sessions
+    onMounted(async () => {
+      authStore.initializeAuth();
+      if (authStore.isAuthenticated) {
+        await chatStore.loadSessions();
+      }
+    });
   
     const scrollToBottom = async () => {
       await nextTick();
@@ -213,6 +263,19 @@
         handleSendMessage(question);
     }
     // --- End Sample Questions ---
+
+    // Session management functions
+    const archiveSession = async (sessionId) => {
+      if (confirm('Are you sure you want to archive this chat?')) {
+        await chatStore.archiveSession(sessionId);
+      }
+    };
+
+    const deleteSession = async (sessionId) => {
+      if (confirm('Are you sure you want to delete this chat? This action cannot be undone.')) {
+        await chatStore.deleteSession(sessionId);
+      }
+    };
   </script>
   
   <style scoped>

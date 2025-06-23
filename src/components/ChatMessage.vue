@@ -12,15 +12,26 @@
       max-width="80%"
     >
       <!-- Render message content safely -->
-      <div v-text="message.text" class="message-text"></div>
+      <div v-text="message.content || message.text" class="message-text"></div>
 
-      <!-- Optional: Add timestamp or citation details -->
-      <!--<div v-if="message.citations" class="text-caption mt-1 citation-details">
-        Sources: {{ message.citations }}
-      </div>-->
-       <div v-if="message.timestamp" class="text-caption mt-1 text-right timestamp">
-         {{ formattedTimestamp }}
-       </div>
+      <!-- Sources for assistant messages -->
+      <div v-if="message.metadata?.sources && message.metadata.sources.length > 0" class="text-caption mt-2 citation-details">
+        <v-divider class="mb-2"></v-divider>
+        <div class="d-flex align-center mb-1">
+          <v-icon icon="mdi-file-document-outline" size="12" class="mr-1"></v-icon>
+          <span class="font-weight-medium">Sources:</span>
+        </div>
+        <div class="sources-list">
+          <div v-for="source in message.metadata.sources" :key="source" class="source-item">
+            {{ source }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Timestamp -->
+      <div v-if="message.created_at || message.timestamp" class="text-caption mt-1 text-right timestamp">
+        {{ formattedTimestamp }}
+      </div>
     </div>
   </div>
 </template>
@@ -32,13 +43,13 @@ const props = defineProps({
   message: {
     type: Object,
     required: true,
-    // Example structure: { id: 1, text: 'Hello', sender: 'user'|'ai'|'error', citations?: string, timestamp?: Date }
+    // Example structure: { id: 1, content: 'Hello', message_type: 'user'|'assistant', metadata?: {}, created_at?: string }
   }
 });
 
-const isUser = computed(() => props.message.sender === 'user');
-const isAi = computed(() => props.message.sender === 'ai');
-const isError = computed(() => props.message.sender === 'error');
+const isUser = computed(() => props.message.message_type === 'user' || props.message.sender === 'user');
+const isAi = computed(() => props.message.message_type === 'assistant' || props.message.sender === 'ai');
+const isError = computed(() => props.message.sender === 'error' || props.message.metadata?.error);
 
 const alignmentClass = computed(() => {
   if (isUser.value) return 'justify-end';
@@ -64,12 +75,12 @@ const messageClass = computed(() => {
 // });
 // --- End Optional Avatar ---
 
-// --- Optional Timestamp Formatting ---
-// const formattedTimestamp = computed(() => {
-//   if (!props.message.timestamp) return '';
-//   return new Date(props.message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-// });
-// --- End Optional Timestamp Formatting ---
+// Timestamp Formatting
+const formattedTimestamp = computed(() => {
+  const timestamp = props.message.created_at || props.message.timestamp;
+  if (!timestamp) return '';
+  return new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+});
 
 </script>
 
@@ -88,6 +99,16 @@ const messageClass = computed(() => {
 .citation-details {
   opacity: 0.8;
   font-style: italic;
+}
+
+.sources-list {
+  margin-left: 1rem;
+}
+
+.source-item {
+  padding: 0.25rem 0;
+  color: #6b7280;
+  font-size: 0.8rem;
 }
 
 .timestamp {
