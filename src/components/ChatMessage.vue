@@ -26,7 +26,7 @@
             <!-- Check if source is an object with URL or just a string -->
             <template v-if="typeof source === 'object' && source.document_url">
               <a 
-                :href="source.document_url" 
+                :href="normalizeUrl(source.document_url)" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 class="source-link"
@@ -102,6 +102,16 @@ const formattedTimestamp = computed(() => {
   if (!timestamp) return '';
   return new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 });
+
+// URL Normalization
+const normalizeUrl = (url) => {
+  if (!url) return '';
+  // If URL starts with www. or lacks protocol, add https://
+  if (url.startsWith('www.') || (!url.startsWith('http://') && !url.startsWith('https://'))) {
+    return 'https://' + url;
+  }
+  return url;
+};
 
 </script>
 
