@@ -21,7 +21,7 @@ export default {
   },
 
   // Function to upload a file
-  uploadFile(file, processImmediately = true, collectionName = null, documentUrl = null) {
+  uploadFile(file, processImmediately = true, collectionName = null, documentUrl = null, productName = null) {
     const formData = new FormData();
     formData.append('file', file);
     formData.append('process_immediately', processImmediately);
@@ -30,6 +30,9 @@ export default {
     }
     if (documentUrl) {
       formData.append('document_url', documentUrl);
+    }
+    if (productName) {
+      formData.append('product_name', productName);
     }
     
     return apiClient.post('/upload_file', formData, {

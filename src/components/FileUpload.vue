@@ -12,6 +12,19 @@
       </div>
     </v-card-title>
     <v-card-text class="upload-content">
+      <!-- Product Name Input Field -->
+      <v-text-field
+        v-model="productName"
+        label="Product Name (optional)"
+        placeholder="e.g., Advanced Work Packaging Implementation Guide"
+        prepend-icon="mdi-tag"
+        variant="outlined"
+        color="primary"
+        class="mb-4 url-input-modern"
+        hint="Name of the product or document for better identification"
+        persistent-hint
+      />
+      
       <!-- URL Input Field -->
       <v-text-field
         v-model="documentUrl"
@@ -145,6 +158,7 @@ const uploadProgress = ref(0)
 const error = ref(null)
 const successMessage = ref(null)
 const documentUrl = ref('')
+const productName = ref('')
 
 // Computed properties
 const acceptedFileTypes = computed(() => {
@@ -174,7 +188,7 @@ const uploadFiles = async () => {
 
     for (const file of selectedFiles.value) {
       try {
-        const result = await ragApi.uploadFile(file, true, null, documentUrl.value)
+        const result = await ragApi.uploadFile(file, true, null, documentUrl.value, productName.value)
         results.push({ file: file.name, success: true, result })
         completedFiles++
         uploadProgress.value = (completedFiles / totalFiles) * 100
@@ -203,6 +217,7 @@ const uploadFiles = async () => {
       // Clear the form inputs
       selectedFiles.value = []
       documentUrl.value = ''
+      productName.value = ''
       
       // Emit event to parent component
       emit('upload-complete', { successful, failed })

@@ -32,8 +32,14 @@
                 class="source-link"
               >
                 <v-icon icon="mdi-open-in-new" size="12" class="mr-1"></v-icon>
-                {{ source.file_name }}
-                <span v-if="source.page_label" class="page-info">(Page {{ source.page_label }})</span>
+                <span v-if="source.product_name" class="product-name">
+                  {{ source.product_name }}
+                  <span class="file-info">({{ source.file_name }}; Page {{ source.page_label }})</span>
+                </span>
+                <span v-else class="file-name">
+                  {{ source.file_name }}
+                  <span v-if="source.page_label" class="page-info">(Page {{ source.page_label }})</span>
+                </span>
               </a>
             </template>
             <template v-else>
@@ -148,6 +154,22 @@ const formattedTimestamp = computed(() => {
   margin-left: 0.25rem;
   font-weight: 500;
   color: #6b7280;
+}
+
+.product-name {
+  font-weight: 600;
+  color: #6366f1;
+}
+
+.file-name {
+  font-weight: 500;
+  color: #6366f1;
+}
+
+.file-info {
+  font-weight: 400;
+  color: #6b7280;
+  margin-left: 0.25rem;
 }
 
 .timestamp {
