@@ -131,8 +131,7 @@
                 />
                 <!-- Loading Indicator -->
                 <div v-if="chatStore.isLoading" class="loading-indicator">
-                  <v-progress-circular indeterminate color="primary" size="24"></v-progress-circular>
-                  <span class="ml-2">Thinking...</span>
+                  <span>AI is thinking...</span>
                 </div>
               </div>
             </div>
@@ -148,9 +147,7 @@
                 <p class="mb-2">Here are the functions I can perform:</p>
                 <ol class="ml-5 mb-4" style="list-style-type: decimal;">
                   <li><strong>Get Membership Status:</strong> I can provide details about your current membership status with CII.</li>
-                  <li><strong>Search Member Organizations:</strong> I can help you find information about member organizations of CII based on your search criteria.</li>
                   <li><strong>Search CII Website Content:</strong> I can search for specific information on the CII website regarding various topics related to CII.</li>
-                  <li><strong>Get Download History Graph:</strong> I can provide a graphical representation of download history related to CII.</li>
                 </ol>
                 <p>
                   Feel free to ask any questions related to CII, and I'll do my best to assist you!
@@ -274,8 +271,6 @@
         'Why is advanced work packaging important with capital projects',
         'As a capital projects planner show me the latest research for industrial modularization',
         'As a capital projects planner what front end planning courses should I take',
-        'As a capital projects planner how should I be planning for infrastructure risk',
-        'Show me the latest research on constructability',
         'Show me the latest research on industrial construction design'
     ]);
 
