@@ -12,6 +12,19 @@
       </div>
     </v-card-title>
     <v-card-text class="upload-content">
+      <!-- URL Input Field -->
+      <v-text-field
+        v-model="documentUrl"
+        label="Document URL (optional)"
+        placeholder="https://www.construction-institute.org/"
+        prepend-icon="mdi-link"
+        variant="outlined"
+        color="primary"
+        class="mb-4 url-input-modern"
+        hint="URL where this document can be accessed. Defaults to https://www.construction-institute.org/"
+        persistent-hint
+      />
+      
       <v-file-input
         v-model="selectedFiles"
         :accept="acceptedFileTypes"
@@ -131,6 +144,7 @@ const isUploading = ref(false)
 const uploadProgress = ref(0)
 const error = ref(null)
 const successMessage = ref(null)
+const documentUrl = ref('')
 
 // Computed properties
 const acceptedFileTypes = computed(() => {
@@ -160,7 +174,7 @@ const uploadFiles = async () => {
 
     for (const file of selectedFiles.value) {
       try {
-        const result = await ragApi.uploadFile(file, true)
+        const result = await ragApi.uploadFile(file, true, null, documentUrl.value)
         results.push({ file: file.name, success: true, result })
         completedFiles++
         uploadProgress.value = (completedFiles / totalFiles) * 100
@@ -186,8 +200,9 @@ const uploadFiles = async () => {
         successMessage.value += `. ${failed.length} file(s) failed.`
       }
       
-      // Clear the file input
+      // Clear the form inputs
       selectedFiles.value = []
+      documentUrl.value = ''
       
       // Emit event to parent component
       emit('upload-complete', { successful, failed })
@@ -242,6 +257,18 @@ const uploadFiles = async () => {
 }
 
 .file-input-modern :deep(.v-field:hover) {
+  border-color: #6366f1;
+  background: #f8fafc;
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.1);
+}
+
+.url-input-modern :deep(.v-field) {
+  border-radius: 8px;
+  background: #f9fafb;
+  transition: all 0.2s ease;
+}
+
+.url-input-modern :deep(.v-field:hover) {
   border-color: #6366f1;
   background: #f8fafc;
   box-shadow: 0 2px 8px rgba(99, 102, 241, 0.1);

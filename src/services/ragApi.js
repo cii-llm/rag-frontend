@@ -21,12 +21,15 @@ export default {
   },
 
   // Function to upload a file
-  uploadFile(file, processImmediately = true, collectionName = null) {
+  uploadFile(file, processImmediately = true, collectionName = null, documentUrl = null) {
     const formData = new FormData();
     formData.append('file', file);
     formData.append('process_immediately', processImmediately);
     if (collectionName) {
       formData.append('collection_name', collectionName);
+    }
+    if (documentUrl) {
+      formData.append('document_url', documentUrl);
     }
     
     return apiClient.post('/upload_file', formData, {

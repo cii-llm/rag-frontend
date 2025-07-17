@@ -22,8 +22,23 @@
           <span class="font-weight-medium">Sources:</span>
         </div>
         <div class="sources-list">
-          <div v-for="source in message.metadata.sources" :key="source" class="source-item">
-            {{ source }}
+          <div v-for="(source, index) in message.metadata.sources" :key="index" class="source-item">
+            <!-- Check if source is an object with URL or just a string -->
+            <template v-if="typeof source === 'object' && source.document_url">
+              <a 
+                :href="source.document_url" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                class="source-link"
+              >
+                <v-icon icon="mdi-open-in-new" size="12" class="mr-1"></v-icon>
+                {{ source.file_name }}
+                <span v-if="source.page_label" class="page-info">(Page {{ source.page_label }})</span>
+              </a>
+            </template>
+            <template v-else>
+              {{ source }}
+            </template>
           </div>
         </div>
       </div>
@@ -109,6 +124,30 @@ const formattedTimestamp = computed(() => {
   padding: 0.25rem 0;
   color: #6b7280;
   font-size: 0.8rem;
+}
+
+.source-link {
+  color: #6366f1;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  transition: all 0.2s ease;
+  border-radius: 4px;
+  padding: 0.25rem 0.5rem;
+  margin: -0.25rem -0.5rem;
+}
+
+.source-link:hover {
+  color: #4f46e5;
+  background-color: #f0f9ff;
+  text-decoration: none;
+  box-shadow: 0 1px 3px rgba(99, 102, 241, 0.1);
+}
+
+.page-info {
+  margin-left: 0.25rem;
+  font-weight: 500;
+  color: #6b7280;
 }
 
 .timestamp {
