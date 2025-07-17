@@ -22,7 +22,7 @@
           <span class="font-weight-medium">Sources:</span>
         </div>
         <div class="sources-list">
-          <div v-for="(source, index) in message.metadata.sources" :key="index" class="source-item">
+          <div v-for="(source, index) in mergedSources" :key="index" class="source-item">
             <!-- Check if source is an object with URL or just a string -->
             <template v-if="typeof source === 'object' && source.document_url">
               <a 
@@ -34,11 +34,11 @@
                 <v-icon icon="mdi-open-in-new" size="12" class="mr-1"></v-icon>
                 <span v-if="source.product_name" class="product-name">
                   {{ source.product_name }}
-                  <span class="file-info">({{ source.file_name }}; Page {{ source.page_label }})</span>
+                  <span class="file-info">({{ source.file_name }}; {{ source.pages }})</span>
                 </span>
                 <span v-else class="file-name">
                   {{ source.file_name }}
-                  <span v-if="source.page_label" class="page-info">(Page {{ source.page_label }})</span>
+                  <span v-if="source.pages" class="page-info">({{ source.pages }})</span>
                 </span>
               </a>
             </template>
@@ -112,6 +112,56 @@ const normalizeUrl = (url) => {
   }
   return url;
 };
+
+// Merge duplicate sources by document identity
+const mergedSources = computed(() => {
+  const sources = props.message.metadata?.sources;
+  if (!sources || !Array.isArray(sources)) return [];
+  
+  // Group sources by document identity (product_name + file_name)
+  const sourceMap = new Map();
+  
+  sources.forEach(source => {
+    if (typeof source === 'object' && source.document_url) {
+      const key = `${source.product_name || 'unknown'}_${source.file_name || 'unknown'}`;
+      
+      if (sourceMap.has(key)) {
+        // Add page to existing source
+        const existing = sourceMap.get(key);
+        if (source.page_label && !existing.pageLabels.includes(source.page_label)) {
+          existing.pageLabels.push(source.page_label);
+        }
+      } else {
+        // Create new source entry
+        sourceMap.set(key, {
+          ...source,
+          pageLabels: source.page_label ? [source.page_label] : []
+        });
+      }
+    } else {
+      // Handle non-object sources (strings)
+      sourceMap.set(`string_${sourceMap.size}`, source);
+    }
+  });
+  
+  // Convert back to array with merged page information
+  return Array.from(sourceMap.values()).map(source => {
+    if (typeof source === 'object' && source.pageLabels) {
+      const pageCount = source.pageLabels.length;
+      const pages = pageCount > 1 
+        ? `Pages ${source.pageLabels.join(', ')}`
+        : pageCount === 1 
+          ? `Page ${source.pageLabels[0]}`
+          : '';
+      
+      return {
+        ...source,
+        pages
+      };
+    }
+    return source;
+  });
+});
 
 </script>
 
