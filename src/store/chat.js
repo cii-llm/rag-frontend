@@ -70,7 +70,7 @@ export const useChatStore = defineStore('chat', () => {
         await loadSessions()
       }
       
-      // Add messages to current view
+      // Add user message to current view
       messages.value.push({
         id: Date.now(), // Temporary ID
         message_type: 'user',
@@ -78,6 +78,7 @@ export const useChatStore = defineStore('chat', () => {
         created_at: new Date().toISOString()
       })
       
+      // Add assistant message to current view
       messages.value.push({
         id: Date.now() + 1, // Temporary ID
         message_type: 'assistant',

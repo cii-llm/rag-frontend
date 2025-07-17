@@ -115,13 +115,12 @@
       <!-- === Modified v-main === -->
       <v-main class="chat-main">
         <!-- Chat Content Area -->
-        <div class="chat-scroll-area">
+        <div class="chat-scroll-area" ref="scrollContainerRef">
           <div class="chat-content-wrapper">
             <!-- === A: Chat Message Area (Only shown if messages exist) === -->
             <div
               v-if="chatStore.messages.length > 0"
               class="chat-messages-container"
-              ref="messageContainerRef"
             >
               <div class="chat-messages">
                 <!-- Display Messages -->
@@ -222,7 +221,7 @@
   
     const chatStore = useChatStore();
     const authStore = useAuthStore();
-    const messageContainerRef = ref(null);
+    const scrollContainerRef = ref(null);
     const { mdAndUp } = useDisplay();
     const isDesktop = computed(() => mdAndUp.value);
     const drawerOpen = ref(true);
@@ -237,12 +236,33 @@
   
     const scrollToBottom = async () => {
       await nextTick();
-      const container = messageContainerRef.value;
-      if (container) {
-        container.scrollTop = container.scrollHeight;
-      }
+      // Small delay to ensure DOM has updated
+      setTimeout(() => {
+        const container = scrollContainerRef.value;
+        if (container) {
+          container.scrollTop = container.scrollHeight;
+        }
+      }, 100);
     };
-    watch(() => chatStore.messages, scrollToBottom, { deep: true });
+    
+    // Watch for message changes and scroll
+    watch(() => chatStore.messages, () => {
+      scrollToBottom();
+    }, { deep: true });
+    
+    // Watch for loading state changes and scroll
+    watch(() => chatStore.isLoading, (newVal) => {
+      if (newVal) {
+        // When loading starts, scroll to bottom
+        scrollToBottom();
+      } else {
+        // When loading ends, scroll to bottom after a small delay
+        setTimeout(() => {
+          scrollToBottom();
+        }, 200);
+      }
+    });
+    
     onMounted(scrollToBottom);
   
     const handleSendMessage = (messageText) => {
